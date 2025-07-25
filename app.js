@@ -165,17 +165,22 @@ app.post('/search', (req, res) => {
     if (!term) {
         return res.status(400).send('Empty search field');
     }
-    const cleanTerm = sanitizeHtml(term, {
-        allowedTags: [],
-        allowedAttributes: {}
-    });
-
-    if (!cleanTerm || cleanTerm.length > 100) return res.redirect('/');
-    res.redirect(`/search?term=${encodeURIComponent(cleanTerm)}`);
-
 
     // Allow only letters, numbers and spaces. up to 100 character long.
+    const termPattern = /^[A-Za-z0-9 ]{1,100}$/;
+    if (!termPattern.test(term)) {
+        return res.redirect('/');
+    }
     
+    // Deny base on patterns
+    if (!validateXSS(term)){
+        return res.redirect('/');
+    }
+    if (!validateSQLInjection(term)){
+        return res.redirect('/');
+    }
+
+    res.redirect(`/search?term=${encodeURIComponent(term)}`);
 
 });
 
