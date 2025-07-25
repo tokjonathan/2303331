@@ -1,0 +1,6 @@
+projectKey=ssd-practical-1
+serverUrl=http://localhost:9000
+serverVersion=25.7.0.110598
+dashboardUrl=http://localhost:9000/dashboard?id=ssd-practical-1
+ceTaskId=18b13b89-a393-45d6-bfa5-598f9d68cb9f
+ceTaskUrl=http://localhost:9000/api/ce/task?id=18b13b89-a393-45d6-bfa5-598f9d68cb9f

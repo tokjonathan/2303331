@@ -13,12 +13,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
       - name: Cache Node.js modules
         uses: actions/cache@v4
         with:
@@ -41,19 +35,7 @@ jobs:
       - name: Debug ESLint Output
         run: cat reports/eslint-results.sarif || echo "No SARIF report generated"
 
-      - name: Check if SARIF file exists and upload
-        run: |
-          if [ -f "reports/eslint-results.sarif" ]; then
-            echo "SARIF file exists, uploading..."
-            echo "SARIF_EXISTS=true" >> $GITHUB_ENV
-          else
-            echo "SARIF file does not exist, skipping upload"
-            echo "SARIF_EXISTS=false" >> $GITHUB_ENV
-          fi
-
       - name: Upload SARIF report
-        if: env.SARIF_EXISTS == 'true'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: reports/eslint-results.sarif
-        continue-on-error: true

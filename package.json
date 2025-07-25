@@ -8,9 +8,12 @@
   "keywords": [],
   "author": "Jonathan",
   "license": "ISC",
-  "description": "Sample Application",
+  "description": "practical test",
   "dependencies": {
     "express": "^5.1.0",
+    "express-validator": "^7.2.1",
+    "express-xss-sanitizer": "^2.0.0",
+    "helmet": "^8.1.0",
     "package.json": "^2.0.1"
   }
 }
