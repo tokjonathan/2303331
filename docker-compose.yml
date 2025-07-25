@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+
+  git-server:
+    build:
+      dockerfile: gitserver.Dockerfile
+      context: .
+    restart: always
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./repos:/var/www/git
+
+  web:
+    build:
+      dockerfile: web.Dockerfile
+      context: .
+    restart: always
+    ports:
+      - "3000:3000"  
+    volumes:
+      - .:/app
+    depends_on:
+      - git-server
