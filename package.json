@@ -11,9 +11,11 @@
   "description": "practical test",
   "dependencies": {
     "express": "^5.1.0",
+    "express-rate-limit": "^8.0.1",
     "express-validator": "^7.2.1",
     "express-xss-sanitizer": "^2.0.0",
     "helmet": "^8.1.0",
-    "package.json": "^2.0.1"
+    "package.json": "^2.0.1",
+    "sanitize-html": "^2.17.0"
   }
 }

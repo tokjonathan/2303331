@@ -2,11 +2,23 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path'); 
 const { body, validationResult } = require('express-validator');
+const rateLimit = require('express-rate-limit');
+const sanitizeHtml = require('sanitize-html');
+
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 30, // limit each IP to 30 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // App Instance
 const app = express();
 app.use(express.urlencoded({ extended: true })); 
 app.use(express.static('public'));
+app.use(limiter); // Apply to all routes
+
+
 
 // Helper functions
 function validateXSS(input) {
@@ -130,6 +142,16 @@ function validateSQLInjection(input) {
     return true; // Input is safe
 }
 
+function escapeHTML(str) {
+  return str.replace(/[&<>"']/g, tag => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  }[tag]));
+}
+
 
 
 // Routes ---
@@ -143,22 +165,17 @@ app.post('/search', (req, res) => {
     if (!term) {
         return res.status(400).send('Empty search field');
     }
+    const cleanTerm = sanitizeHtml(term, {
+        allowedTags: [],
+        allowedAttributes: {}
+    });
+
+    if (!cleanTerm || cleanTerm.length > 100) return res.redirect('/');
+    res.redirect(`/search?term=${encodeURIComponent(cleanTerm)}`);
+
 
     // Allow only letters, numbers and spaces. up to 100 character long.
-    const termPattern = /^[A-Za-z0-9 ]{1,100}$/;
-    if (!termPattern.test(term)) {
-        return res.redirect('/');
-    }
     
-    // Deny base on patterns
-    if (!validateXSS(term)){
-        return res.redirect('/');
-    }
-    if (!validateSQLInjection(term)){
-        return res.redirect('/');
-    }
-
-    res.redirect(`/search?term=${encodeURIComponent(term)}`);
 
 });
 
@@ -170,7 +187,7 @@ app.get('/search', (req, res) => {
     <html>
       <body>
         <h1>Search Results</h1>
-        <p>You searched for: <strong>${term}</strong></p>
+        <p>You searched for: <strong>${escapeHTML(term)}</strong></p>
         <a href="/"><button>Return to Homepage</button></a>
       </body>
     </html>
